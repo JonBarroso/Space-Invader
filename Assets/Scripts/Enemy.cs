@@ -18,10 +18,20 @@ public class Enemy : MonoBehaviour
   public float shootingInterval = 2f; 
   public float bulletSpeed = 5f; 
 
+  public AudioClip EnemyShootAudio;
+  public AudioClip EnemyDeathSound;
+  private AudioSource audioSource;
 
+
+    private void Start()
+    {
+        audioSource = GetComponent<AudioSource>();
+    }
     void OnCollisionEnter2D(Collision2D collision)
     {
+
       GetComponent<Animator>().SetTrigger("Death");
+      audioSource.PlayOneShot(EnemyDeathSound);
 
       Debug.Log("Ouch!");
       Destroy(collision.gameObject);
@@ -49,7 +59,8 @@ public class Enemy : MonoBehaviour
     }
     void Shoot()
     {
-        GameObject shot = Instantiate(bullet, shottingOffset.position, Quaternion.identity);
+      GameObject shot = Instantiate(bullet, shottingOffset.position, Quaternion.identity);
+      audioSource.PlayOneShot(EnemyShootAudio);
 
     }
 }

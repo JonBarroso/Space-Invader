@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using UnityEngine.SceneManagement;
 
 public class Player : MonoBehaviour
 {
@@ -12,16 +13,27 @@ public class Player : MonoBehaviour
   public int score = 0;
   public int hiScore = 0;
   public float unitsPerSecond = 3f;
+  public AudioClip shootAudio;
+  public AudioClip Deathsound;
+  private AudioSource audioSource;
 
 
   void Start()
   {
+    audioSource = GetComponent<AudioSource>();
     hiScore = PlayerPrefs.GetInt("HighScore", 0);
     UpdateHiScoreText();
     UpdateScoreText();
 
     Enemy.OnEnemyDied += EnemyOnOnEnemyDied;
   }
+  // void OnCollisionEnter2D(Collision2D collision)
+  // {
+  //   GetComponent<Animator>().SetTrigger("Death");
+
+  //   Debug.Log("Player Death");
+  //   Destroy(collision.gameObject);
+  // }
   void OnDestroy()
   {
     PlayerPrefs.SetInt("HighScore", hiScore);
@@ -52,6 +64,7 @@ public class Player : MonoBehaviour
 
       if (Input.GetKeyDown(KeyCode.Space))
       {
+        audioSource.PlayOneShot(shootAudio);
         GetComponent<Animator>().SetTrigger("Shoot Trigger");
         GameObject shot = Instantiate(bullet, shottingOffset.position, Quaternion.identity);
         Debug.Log("Bang!");
@@ -69,9 +82,16 @@ public class Player : MonoBehaviour
  
         if (player.CompareTag("Bullet"))
         {
+            audioSource.PlayOneShot(Deathsound);
+            GetComponent<Animator>().SetTrigger("PlayerDied");
             Destroy(gameObject);   
             Destroy(player.gameObject);
+            // SceneManager.LoadScene("CreditScene");
         }
+    }
+    void DeathAnimation()
+    {
+      Destroy(gameObject);
     }
     void UpdateScoreText()
     {

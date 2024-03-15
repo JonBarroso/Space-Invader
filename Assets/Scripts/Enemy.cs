@@ -1,46 +1,40 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public class Enemy : MonoBehaviour
 {
-  public int points = 3;
-  public delegate void EnemyDied(int pointsWorth);
-  public static event EnemyDied OnEnemyDied;
+  public int points = 10;
 
-  private Vector3 direction = Vector3.right;
   public float speed = 1f;
+  private float currentSpeed; // Current speed of the enemies
+  private Vector3 direction = Vector3.right; 
 
   public GameObject bullet;
-  private float shootingTimer = 0f;
 
   public Transform shottingOffset;
   public float shootingInterval = 2f; 
   public float bulletSpeed = 5f; 
 
-  public AudioClip EnemyShootAudio;
-  public AudioClip EnemyDeathSound;
+  private float shootingTimer = 0f;
+  public delegate void EnemyDied(int pointWorth);
+  public static event EnemyDied OnEnemyDied;
+
+  public AudioClip enemydeathsound;
+
+  public AudioClip enemyShootSound;
+
   private AudioSource audioSource;
 
-
-    private void Start()
+    void Start()
     {
         audioSource = GetComponent<AudioSource>();
-    }
-    void OnCollisionEnter2D(Collision2D collision)
-    {
-
-      GetComponent<Animator>().SetTrigger("Death");
-      audioSource.PlayOneShot(EnemyDeathSound);
-
-      Debug.Log("Ouch!");
-      Destroy(collision.gameObject);
-
-      OnEnemyDied.Invoke(points);
-    }
-    void DeathAnimation()
-    {
-      Destroy(gameObject);
+         if (audioSource == null)
+        {
+            audioSource = gameObject.AddComponent<AudioSource>();
+        }
+        currentSpeed = speed;
     }
     void Update()
     {
@@ -57,10 +51,43 @@ public class Enemy : MonoBehaviour
             Shoot();
         }
     }
-    void Shoot()
-    {
-      GameObject shot = Instantiate(bullet, shottingOffset.position, Quaternion.identity);
-      audioSource.PlayOneShot(EnemyShootAudio);
 
+    void OnCollisionEnter2D(Collision2D collision)
+    {
+      GetComponent<Animator>().SetTrigger("Death");
+      audioSource.PlayOneShot(enemydeathsound);
+      // Debug.Log("Ouch!");
+      Destroy(collision.gameObject);
+
+      OnEnemyDied.Invoke(points);
+
+      IncreaseSpeed();
+    }
+    void DeathAnimation()
+    {
+      Debug.Log("enemy died");
+      
+      Destroy(gameObject);
+    }
+
+    void Shoot()
+{
+    audioSource.PlayOneShot(enemyShootSound);
+
+    // Check if the shottingOffset is null or has been destroyed
+    if (shottingOffset != null)
+    {
+        // Instantiate a bullet at the position of the shottingOffset
+        GameObject shot = Instantiate(bullet, shottingOffset.position, Quaternion.identity);
+    }
+    else
+    {
+        Debug.LogWarning("shottingOffset is null or destroyed. Cannot shoot.");
+    }
+}
+
+    void IncreaseSpeed()
+    {
+        currentSpeed += 0.1f; 
     }
 }

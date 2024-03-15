@@ -31,7 +31,26 @@ public class TitleLogic : MonoBehaviour
     }
     public void LoadCredit()
     {
-        SceneManager.LoadScene("CreditScene");
+        // SceneManager.LoadScene("CreditScene");
+        float delayInSeconds = 5f; 
+        StartCoroutine(ReturnCredit(delayInSeconds));
+    }
+    public void ReturnMain(float delay)
+    {
+        StartCoroutine(ReturnMainCoroutine(delay));
     }
 
+    IEnumerator ReturnMainCoroutine(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        SceneManager.LoadScene("MainMenuScene");
+    }
+    IEnumerator ReturnCredit(float delay)
+    {
+    SceneManager.LoadScene("CreditScene");
+
+    yield return new WaitForSeconds(delay);
+
+    SceneManager.LoadScene("MainMenuScene");
+    }
 }
